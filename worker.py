@@ -8,17 +8,15 @@ import zmq
 import cloud
 
 from config.settings import CONFIG
-from message import Message
-
 
 LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 class Worker(object):
     """A remote task executor."""
 
     def __init__(self, host, port, worker_id=0):
         """Initialize worker."""
-        print 'starting worker [{}]'.format(worker_id)
         LOGGER.info('Starting worker [{}]'.format(worker_id))
         self.host = host
         self.port = port
@@ -41,7 +39,7 @@ class Worker(object):
 
     def _do_work(self, task, args, kwargs):
         """Return the result of executing the given task."""
-        print('[{}] running [{}] with args [{}] and kwargs [{}]'.format(self._id,
+        LOGGER.info('[{}] running [{}] with args [{}] and kwargs [{}]'.format(self._id,
             task, args, kwargs))
         return task(*args, **kwargs)
 
