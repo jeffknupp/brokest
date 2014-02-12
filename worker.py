@@ -7,15 +7,13 @@ import multiprocessing
 import zmq
 import cloud
 
-from config.settings import CONFIG
-
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 class Worker(object):
     """A remote task executor."""
 
-    def __init__(self, host, port, worker_id=0):
+    def __init__(self, host='127.0.0.1', port=7080, worker_id=0):
         """Initialize worker."""
         LOGGER.info('Starting worker [{}]'.format(worker_id))
         self.host = host
@@ -28,7 +26,7 @@ class Worker(object):
         """Start listening for tasks."""
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REP)
-        self._socket.bind('tcp://{}:{}'.format(self.host, self.port))
+        self._socket.connect('tcp://127.0.0.1:7080')
         while True:
             message = self._socket.recv_pyobj()
             runnable = pickle.loads(message.runnable_string)
@@ -44,9 +42,5 @@ class Worker(object):
         return task(*args, **kwargs)
 
 if __name__ == '__main__':
-    workers = []
-    for worker in CONFIG['WORKERS']:
-        w = Worker(worker[0], worker[1], worker[2])
-        process = multiprocessing.Process(target=w.start)
-        process.start()
-     
+    w = Worker()
+    w.start()
