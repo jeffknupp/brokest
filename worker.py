@@ -7,6 +7,8 @@ import multiprocessing
 import zmq
 import cloud
 
+from config.settings import CONFIG
+
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
@@ -26,7 +28,9 @@ class Worker(object):
         """Start listening for tasks."""
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REP)
-        self._socket.connect('tcp://127.0.0.1:7080')
+        self._socket.connect('tcp://{}:{}'.format(
+            CONFIG['back-end-host'],
+            CONFIG['back-end-port']))
         while True:
             message = self._socket.recv_pyobj()
             runnable = pickle.loads(message.runnable_string)
